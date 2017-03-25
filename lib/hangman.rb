@@ -5,8 +5,8 @@ class Hangman
     @random_word = RandomWord.new
     @bad_guesses_left = 10
     @guessed_letters = []
-    @guessed_positions = []
-    @word_array = @random_word.word.split("")
+    @word_display = @random_word.positions_for(@guessed_letters)
+    @word_array = @random_word.array_of_word
   end
 
   def play!
@@ -15,6 +15,7 @@ class Hangman
     while  !lose? && !win? && !@win
       respond(get_letter)
       print_score
+      puts @guessed_positions
     end
     if win? || @win
       puts "yeaaah! you won! woohooo!"
@@ -28,7 +29,7 @@ class Hangman
   end
 
   def win?
-    @guessed_positions.length == @word_array.length
+    @word_display == @word_array
   end
 
   def lose?
@@ -43,8 +44,10 @@ class Hangman
   def respond(input)
     if input.length > 1
       word_guess(input)
-    end
-    if @word_array.include?(input)
+    elsif @guessed_letters.include?(input)
+      puts "you've already guessed that"
+      return
+    elsif @word_array.include?(input)
       puts "that's correct"
     else
       puts "that's incorrect"
@@ -55,16 +58,13 @@ class Hangman
 
   def display_word(letter)
     @guessed_letters << letter
-    @guessed_positions = @random_word.positions_for(@guessed_letters)
-    puts "these are the guessed possitions: #{@guessed_positions}"
-    i = 0
-    @word_array.each do |letter|
-      if @guessed_positions.include?(i)
-        print letter
-      else
+    @word_display = @random_word.positions_for(@guessed_letters)
+    @word_display.each do |letter|
+      if letter == ""
         print "-"
+      else
+        print letter
       end
-      i += 1
     end
     puts "\n"
   end
