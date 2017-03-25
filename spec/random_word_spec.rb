@@ -8,12 +8,10 @@ RSpec.describe RandomWord do
   end
 
   describe "#positions_for(characters: [])" do
-    before do
-      allow(random_word).to receive(:word).and_return("homebrew")
-    end
+    let!(:random_word) { RandomWord.new("homebrew") }
 
     it "returns the character positions for all passed in characters" do
-      expect(random_word.positions_for(characters: ["e"])).to eq(["", "", "", "e", "", "", "e", ""])
+      expect(random_word.positions_for(["e"])).to eq(["", "", "", "e", "", "", "e", ""])
     end
   end
 end
