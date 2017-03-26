@@ -1,5 +1,5 @@
 class RandomWord
-  attr_accessor :word, :guessed_positions
+  attr_accessor :word
 
   WORDS = %w(programming monkeybusiness rubyesque styleguide homebrew)
 
@@ -12,10 +12,8 @@ class RandomWord
   end
 
   def positions_for(characters = [])
-    word_array = array_of_word
     @guessed_positions = []
-
-    word_array.each do |letter|
+    array_of_word.each do |letter|
       if characters.include?(letter)
         @guessed_positions << letter
       else

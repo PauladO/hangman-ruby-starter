@@ -1,6 +1,9 @@
 require File.expand_path("../random_word", __FILE__)
 
 class Hangman
+  attr_accessor :random_word
+  attr_reader :bad_guesses_left
+
   def initialize
     @random_word = RandomWord.new
     @bad_guesses_left = 10
@@ -9,16 +12,15 @@ class Hangman
   end
 
   def play!
-    puts "Let's play Hangman!\nYou can type a letter or a word as a guess.\nWhat's your first guess?"
+    puts "Let's hang this man!\nYou can type a letter or a word as a guess.\nWhat's your first guess?"
     respond(gets.chomp)
+    print_score
     while !lose? && !win?
       respond(get_letter)
       print_score
     end
     if win?
       puts "yeaaah! you won! woohooo!"
-    else
-      puts "you looooose! booooo!"
     end
   end
 
@@ -28,12 +30,11 @@ class Hangman
   end
 
   def respond(input)
-    if input.length > 1
-      word_guess(input)
-    elsif @guessed_letters.include?(input)
+    if already_guessed?(input)
       puts "you've already guessed that"
-      return
-    elsif @random_word.array_of_word.include?(input)
+    elsif is_a_word?(input)
+      word_guess(input)
+    elsif letter_is_in_word?(input)
       puts "that's correct"
     else
       puts "that's incorrect"
@@ -42,21 +43,20 @@ class Hangman
     display_word(input)
   end
 
+
   def word_guess(word)
-    puts "You've guessed the word is #{word}"
+    puts "You've guessed the word is #{word}. "
     if @random_word.word == word
       puts "That is correct!"
       @win = true
     else
-      puts "noooooo, you suck. try again"
+      puts "Not that word. Come on, his life depends on it!"
       @bad_guesses_left -= 1
     end
   end
 
-  def display_word(letter)
-    @guessed_letters << letter
-    @word_display = @random_word.positions_for(@guessed_letters)
-    @word_display.each do |letter|
+  def display_word(new_letter)
+    guessed_letters_in_position(new_letter).each do |letter|
       if letter == ""
         print " - "
       else
@@ -66,8 +66,26 @@ class Hangman
     puts "\n"
   end
 
+  def guessed_letters_in_position(new_letter)
+    @guessed_letters << new_letter
+    @random_word.positions_for(@guessed_letters)
+  end
+
   def print_score
+    killing_it
     puts "You have #{@bad_guesses_left} guesses left"
+  end
+
+  def is_a_word?(input)
+    input.length > 1
+  end
+
+  def already_guessed?(input)
+    @guessed_letters.include?(input)
+  end
+
+  def letter_is_in_word?(input)
+    @random_word.array_of_word.include?(input)
   end
 
   def win?
@@ -76,5 +94,32 @@ class Hangman
 
   def lose?
     @bad_guesses_left == 0
+  end
+
+  def killing_it
+    case @bad_guesses_left
+    when 10
+      puts "____\nNothing to see here..."
+    when 9
+      puts "|\n|\n|____\nConstruction has started."
+    when 8
+      puts "|\n|\n|\n|\n|____\nDeath has been informed."
+    when 7
+      puts "___\n| \n|\n|\n|\n|____\nStructure completed"
+    when 6
+      puts "___\n| |\n| \n|\n|\n|____\nHanging the rope"
+    when 5
+      puts "___\n| |\n| O\n|\n|\n|____\nTied the noose"
+    when 4
+      puts "___\n| |\n| O\n| ∆\n|\n|____\nOh you are failing!"
+    when 3
+      puts "___\n| |\n| O\n|/∆\n|\n|____\nDeath to the little man!"
+    when 2
+      puts "___\n| |\n| O\n|/∆\\\n|\n|____\nI guess he deserves it."
+    when 1
+      puts "___\n| |\n| O\n|/∆\\\n|/ \n|____\nHis days are counted."
+    when 0
+      puts "___\n| |\n| O\n|/∆\\\n|/ \\\n|____\nCongratulations! It dead."
+    end
   end
 end
